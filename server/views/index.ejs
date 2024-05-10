@@ -1,0 +1,135 @@
+<style>
+	*{
+		margin: 0;
+		border: 0;
+	}
+	#box{
+		background-color: rgba(0,0,0,0.5);
+		overflow: hidden;
+	}
+	.clock{
+			width: 500px;
+			height: 240px;
+			border: 10px solid #bcff00;
+			border-radius: 30px;
+			text-align: center;
+			background-color: #8808f9;
+			display: flex;
+			flex-direction: column;
+			box-shadow: 0 0 7px 7px #8808f9;
+			box-sizing: border-box;
+	}
+	.time {
+			color: #fff;
+			font-size: 162px;
+			font-weight: 800;
+			font-family: 'Bahnschrift SemiBold';
+			height: 162px;
+			justify-content: center;
+			display: flex;
+			align-items: center;
+			line-height: 162px;
+	}
+	.time2 {
+			color: #fff;
+			font-size: 102px;
+			font-weight: 800;
+			font-family: 'Bahnschrift SemiBold';
+			height: 162px;
+			justify-content: center;
+			display: flex;
+			align-items: center;
+			line-height: 162px;
+	}
+	.word1{
+			font-size: 16px;
+			color: #c180fd;
+			padding-top: 6px;
+			font-weight: bolder;
+			margin-bottom: 4px;
+	}
+
+	.word2{
+			font-size: 16px;
+			color: #c180fd;
+			border: 10px;
+			margin-bottom: 5px;
+			font-weight: bolder;
+	}
+	#clock2{
+		display: none;
+		animation: shake 0.5s; 
+		animation-iteration-count: 3;
+	}
+	
+	@keyframes shake {
+		0% { transform: translateX(0); }
+		15% { transform: translateX(-5px); }
+		30% { transform: translateX(5px); }
+		45% { transform: translateX(-5px); }
+		60% { transform: translateX(5px); }
+		75% { transform: translateX(-5px); }
+		80% { transform: translateX(5px); }
+		100% { transform: translateX(5px); }
+	}
+
+</style>
+<div id="box">
+    <div class="clock" id="clock1">
+        <div class="word1">COUNTDOWN</div>
+        <div class="time" id="time"><%=def%></div>
+        <div class="word2">© VIVRE-MOTION</div>
+    </div>
+    <div class="clock" id="clock2">
+        <div class="word1">COUNTDOWN</div>
+        <div class="time2">结束啦</div>
+        <div class="word2">© VIVRE-MOTION</div>
+    </div>
+</div>
+<script>
+	var second='<%=second%>';
+	var opTime=++second;
+	var repeat='<%=repeat%>';
+	var uuid='<%=uuid%>';
+	var Clock = document.getElementById('clock1');
+	var Clock1 = document.getElementById('clock2');
+	var Timer = document.getElementById('time');
+	console.log('clock:', Clock);
+	console.log('clock1:', Clock1);
+	console.log('repeat:', repeat);
+
+	function operTime(time) {
+    var min=Math.floor(time/60);
+    var sec=time-min*60;
+    console.log('time min:',min,' sec:', sec);
+    return (min<10?'0'+min:min)+':'+(sec<10?'0'+sec:sec);
+	}
+	
+	var timer = setInterval(()=>{
+		second--;
+		console.log('get second:', second);
+		console.log('get opTime:', opTime);
+		Timer.innerHTML=operTime(second);
+		if (second<=0) {
+			if(repeat>0) {
+				repeat--;
+				second=opTime;
+			} else {
+				clearInterval(timer);
+				Clock.style.display='none';
+				Clock1.style.display='block';
+				setTimeout(()=>{
+					console.log('closeWeb');
+					closeWeb();
+				},3000);
+			}
+		}
+	}, 1000);
+
+	function closeWeb() {
+		fetch('http://127.0.0.1:3910/close')
+			.then(response => response.json())
+			.then(data => console.log(data))
+			.catch(error => console.log('Error:', error));
+	}
+</script>

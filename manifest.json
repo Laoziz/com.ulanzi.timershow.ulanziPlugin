@@ -1,0 +1,25 @@
+{
+  "Name":"Timer",
+  "Author":"Ulanzi",
+  "Description":"countdown",
+  "PrivateAPI":true,
+  "Version":"1.0.0",
+  "Category":"Ulanzi Deck",
+  "CategoryIcon":"images/timer",
+  "CodePath":"server/app.js",
+  "Type": "JavaScript",
+  "UUID":"com.ulanzi.ulanzideck.timer",
+  "OS": [{ "Platform": "windows", "MinimumVersion": "10" }],
+  "Actions":[
+    {
+      "Icon": "images/timer",
+      "Name": "Timer",
+      "States": [{ "Image": "images/timer", "TitleAlignment": "middle" }],
+      "state": 0,
+      "SupportedInMultiActions": false,
+      "Tooltip": "Moments Slideshow",
+      "PropertyInspectorPath": "timer.html",
+      "UUID": "com.ulanzi.ulanzideck.timer.plugin"
+    }
+  ]
+}

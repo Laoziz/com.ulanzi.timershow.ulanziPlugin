@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        html,body{
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            font-size: 9pt;
+        }
+        body {
+            width: 498px;
+            min-height: 274px;
+            max-height: 398px;
+            background-color: #2D2D2D;
+            color: #d8d8d8;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            -webkit-text-size-adjust: 100%;
+            -webkit-font-smoothing: antialiased;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #999999;
+            outline: 1px solid slategrey;
+            border-radius: 8px;
+        }
+        #chizi{
+            width: 498px;
+            height: 2px;
+            box-sizing: border-box;
+            border: 2px solid #fff;
+        }
+        .sdpi-heading {
+            display: flex;
+            flex-basis: 100%;
+            align-items: center;
+            color: inherit;
+            font-size: 9pt;
+            margin: 8px 0px;
+        }
+
+        .sdpi-heading::before,
+        .sdpi-heading::after {
+            content: "";
+            flex-grow: 1;
+            background: #3D3D3D;
+            height: 1px;
+            font-size: 0px;
+            line-height: 0px;
+            margin: 0px 16px;
+        }
+        #box {
+            padding: 20px 20px;
+            width: 100%;
+            box-sizing: border-box;
+            position: relative;
+            /* border: 1px solid #fff; */
+        }
+        span{
+            width: 35px;
+            display: inline-block;
+            text-align: right;
+            font-size: 14px;
+        }
+        label{
+            font-weight: 600;
+            font-size: 14px;
+            display: inline-block;
+            width: 100px;
+            text-align: right;
+            margin-right: 5px;
+        }
+        #repeat-lab{
+            width: 50px;
+            margin: 0;
+            display: inline-block;
+            width: 70px;
+        }
+        .title {
+            width: 100px;
+            display: flex;
+            text-align: right;
+            align-items: center;
+            padding-right: 5px;
+            box-sizing: border-box;
+            margin-right: 5px;
+            height: 35px;
+        }
+        .content {
+            display: inline-block;
+            color: #d8d8d8;
+            width: 300px;
+            line-height: 35px;
+            border: 1px solid red;
+            height: 35px;
+        }
+        .row-box{
+            height: 50px;
+            box-sizing: border-box;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            /* vertical-align: top; */
+        }
+        input,select{
+            background-color: #3d3d3d;
+            height: 32px;
+            color: #dddddd;
+            width: 250px;
+            border: none;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        option{
+            height: 20px;
+        }
+        button {
+            width: 20px;
+            height: 20px;
+            background-color: #3d3d3d;
+            color: #d8d8d8;
+            border: none;
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none !important;
+            margin: 0;
+        }
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 190px;
+            margin: auto 6px;
+            background-color: #2d2d2d;
+            /* border-radius: 10px; */
+            /*这个属性设置使填充进度条时的图形为圆角*/
+        }
+        /* 自定义滑块   */
+        input[type=range]::-webkit-slider-thumb {  
+            -webkit-appearance: none;  
+            width: 14px;  
+            height: 14px;  
+            background-color: #fff;  
+            border-radius: 50%;  
+            cursor: pointer;  
+            margin-top: -6px; 
+            box-direction: 1px solid #fff;
+            /* 使滑块垂直居中  */
+        }  
+        input[type=range]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            background: -webkit-linear-gradient(#ddd, #fff) no-repeat, #ddd;
+            height: 2px;
+            border-radius: 2px;
+        }
+        #clock{
+            margin: 30px 100px;
+            width: 248px;
+            height: 120px;
+            border: 3px solid #bcff00;
+            border-radius: 30px;
+            text-align: center;
+            background-color: #8808f9;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 7px 7px #8808f9;
+            /* position: fixed;
+            left: 60px;
+            top: 50px; */
+        }
+        #time {
+            color: #fff;
+            font-size: 90px;
+            font-weight: 800;
+            font-family: 'Bahnschrift SemiBold';
+            height: 85px;
+            /* border: 3px solid red; */
+            justify-content: center;
+            display: flex;
+            align-items: center;
+            line-height: 85px;
+        }
+        .word1{
+            font-size: 12px;
+            color: #c180fd;
+            padding-top: 2px;
+            font-weight: bolder;
+            /* border: 1px solid black; */
+        }
+
+        .word2{
+            font-size: 12px;
+            color: #c180fd;
+            border: 10px;
+            margin-bottom: 5px;
+            font-weight: bolder;
+            /* border: 1px solid black; */
+        }
+        #input-second{
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="box">
+        <div class="sdpi-heading">STREAM DESK BUTTON</div>
+        <div class="row-box">
+            <!-- <div id="" class="title"> -->
+                <label for="">ButtonMode:</label>
+            <!-- </div> -->
+            <!-- <div class="content"> -->
+                <select name="operate" id="operate">
+                    <option value="0">Open New Instance</option>
+                    <option value="1">Restart(Close and Open) Instance</option>
+                </select>
+            <!-- </div> -->
+
+        </div>
+        <div class="sdpi-heading">SYSTEM MODE</div>
+        <div class="row-box">
+            <!-- <div id="" class="title"> -->
+                <label for="Mode">Mode: </label>
+            <!-- </div> -->
+            <!-- <div class="content"> -->
+                <select name="Mode" id="mode">
+                    <option value="0">CountDown</option>
+                </select>
+            <!-- </div> -->
+        </div>
+        <div class="row-box">
+            <label for="">Second: </label>
+            <input type="number" name="" id="second" placeholder="3 (0~3600)" min="3" max="3600">
+            
+        </div>
+        <div class="row-box">
+            <div id="" class="title">
+                <span for="" id="repeat-lab">Repeat</span> <span id="repeat">0x</span>
+            </div>
+                <button onclick="sub()">-</button>
+                <input type="range" name="" id="repeat-times" min="0" max="100" value=0>
+                <button onclick="add()">+</button>
+        </div>
+        <div class="sdpi-heading">APPEARANCE</div>
+        <!-- <div id="input-second">
+            <label for="second">Second:  </label> <input type="number" name="" id="second">
+        </div> -->
+        
+        <div id="clock">
+            <div class="word1">COUNTDOWN</div>
+            <div id="time">00:00</div>
+            <div class="word2">© VIVRE-MOTION</div>
+        </div>
+    </div>
+</body>
+<script>
+    var progress=null;
+    var Repeat=null;
+    var upWebConnect=null;
+    var mainConnect=null;
+    var UUID="com.ulanzi.ulanzideck.timer.plugin";
+    var repeatElm=null;
+    var modeElm=null;
+    var operateElm=null;
+    var secondElm=null;
+    function onchange(value){
+        console.log('progress:', this.value);
+        Repeat = document.getElementById('repeat');
+        Repeat.innerHTML=this.value+'x';
+    }
+
+    function onload() {
+        console.log('页面加载完成');
+        progress = document.getElementById('repeat-times');
+        Repeat = document.getElementById('repeat');
+
+        modeElm=document.getElementById('mode');
+        operateElm=document.getElementById('operate');
+        secondElm=document.getElementById('second');
+        console.log(progress);
+        progress.addEventListener('input', onchange);
+    }
+
+    function add() {
+        console.log('add',progress.value);
+        var value=parseInt(progress.value);
+        value=value>=100?100:value+1;
+        progress.value=value;
+        Repeat.innerHTML=value+'x';
+    }
+
+    function sub() {
+        console.log('sub',progress.value);
+        var value=parseInt(progress.value);
+        value=value==0?0:value-1;
+        progress.value=value;
+        Repeat.innerHTML=value+'x';
+    }
+
+    function connectToUpServer(){
+        console.log('connectToUpServer:ws://172.0.0.1:3906');
+        upWebConnect=new WebSocket("ws://127.0.0.1:3906");
+        upWebConnect.onopen=function(){
+            // alert("onopen");
+            const json = {
+                code:0,
+                cmd:"connected",
+                uuid:UUID,
+            };
+            upWebConnect.send(JSON.stringify(json));
+        }
+
+        upWebConnect.onmessage=function(msg){
+            // alert("onmessage");
+            try {
+                if (!!msg.data) {
+                    const message = JSON.parse(msg.data);
+                    // alert('onmessage:'+JSON.stringify(msg.data));
+                    console.log('onmessage:', JSON.stringify(msg.data));
+                    console.log('onmessage:', msg.data);
+                    parseCmd(message);
+                }
+            } catch(err) {
+                alert(err.toString());
+            }
+            
+        }
+
+        upWebConnect.onerror=function(err){
+            // alert('onerror'+JSON.stringify(err));
+            console.log(err.toString());
+        }
+        upWebConnect.onclose=function(evt){
+            // alert('onclose'+JSON.stringify(evt));
+            var reason=WEBSOCKETERROT(evt);
+            console.warn('reason');
+        }
+    }
+
+    function parseCmd(data) {
+        const {cmd, uuid, key, param={}} = data;
+        console.log('parseCmd:', JSON.stringify(data));
+        if (data.cmd == "add") {
+            currentKey = key;
+            const json={
+                code: 0,
+                cmd: "add",
+                uuid,
+                key,
+            }
+            upWebConnect.send(JSON.stringify(json));
+        }
+        if (data.cmd == "paramfromapp") {
+            const data = param;
+            
+        }
+        if (data.cmd == "run") {
+            const data = param;
+
+            var mode=modeElm.options[modeElm.selectedIndex].value;
+            var operate=operateElm.options[operateElm.selectedIndex].value;
+            var second=secondElm.value;
+            var repeat=progress.value;
+            console.log('get value:',mode,operate,second,repeat);
+            var url = "http:127.0.0.1:3910?"+'repeat='+repeat+'&second='+second+'&operate='+operate;
+            console.log('get url:',url);
+            var json={
+                "cmd": "openview",
+                "url": url,
+                "width": 200,
+                "height": 200,
+                "x": 100,
+                "y": 100
+            };
+            upWebConnect.send(JSON.stringify(json));
+        }
+    }
+    // function connectToMainServer(){
+
+    // }
+
+    window.onload(onload);
+    connectToUpServer();
+    setInterval(()=>{
+        var mode=modeElm.options[modeElm.selectedIndex].value;
+        var operate=operateElm.options[operateElm.selectedIndex].value;
+        var second=secondElm.value;
+        var repeat=progress.value;
+        console.log('get value:',mode,operate,second,repeat);
+    },5000);
+
+    function send(){
+        var mode=modeElm.options[modeElm.selectedIndex].value;
+        var operate=operateElm.options[operateElm.selectedIndex].value;
+        var second=secondElm.value;
+        var repeat=progress.value;
+        console.log('get value:',mode,operate,second,repeat);
+        var url = "http:127.0.0.1:3910?"+'repeat='+repeat+'&second='+second+'&operate='+operate;
+        fetch(url)
+			.then(response => response.json())
+			.then(data => console.log(data))
+			.catch(error => console.log('Error:', error));
+    }
+    // connectToMainServer();
+</script>
+</html>
