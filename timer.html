@@ -227,7 +227,7 @@
                 <label for="">ButtonMode:</label>
             <!-- </div> -->
             <!-- <div class="content"> -->
-                <select name="operate" id="operate">
+                <select name="operate" id="operate" onchange="onopechange()">
                     <option value="0">Open New Instance</option>
                     <option value="1">Restart(Close and Open) Instance</option>
                 </select>
@@ -247,7 +247,7 @@
         </div>
         <div class="row-box">
             <label for="">Second: </label>
-            <input type="number" name="" id="second" placeholder="3 (0~3600)" min="3" max="3600">
+            <input type="number" name="" id="second" placeholder="3 (0~3600)" min="3" max="3600" onchange="onsecchange()">
             
         </div>
         <div class="row-box">
@@ -255,7 +255,7 @@
                 <span for="" id="repeat-lab">Repeat</span> <span id="repeat">0x</span>
             </div>
                 <button onclick="sub()">-</button>
-                <input type="range" name="" id="repeat-times" min="0" max="100" value=0>
+                <input type="range" name="repeat" id="repeat-times" min="0" max="100" value=0>
                 <button onclick="add()">+</button>
         </div>
         <div class="sdpi-heading">APPEARANCE</div>
@@ -279,11 +279,27 @@
     var repeatElm=null;
     var modeElm=null;
     var operateElm=null;
+    var currentKey = null;
+    var curActionid = null;
     var secondElm=null;
+    var pluginUpdate='http://127.0.0.1:3910/update?';
     function onchange(value){
-        console.log('progress:', this.value);
+        console.log('repeat:', this.value);
         Repeat = document.getElementById('repeat');
         Repeat.innerHTML=this.value+'x';
+        sendRep();
+    }
+    function onsecchange(value){
+        console.log('second:', this.value);
+        secondElm=document.getElementById('second');
+        var value = secondElm.value;
+        if (value>0&&value<3600) {
+            sendSec();
+        }
+    }
+    function onopechange(value){
+        console.log('opeta:', this.value);
+        sendOpe();
     }
 
     function onload() {
@@ -304,6 +320,7 @@
         value=value>=100?100:value+1;
         progress.value=value;
         Repeat.innerHTML=value+'x';
+        sendRep();
     }
 
     function sub() {
@@ -312,13 +329,41 @@
         value=value==0?0:value-1;
         progress.value=value;
         Repeat.innerHTML=value+'x';
+        sendRep();
     }
 
+    function updateView(param) {
+        const {second, repeat, mode, operate} = param;
+        if (!!second) {
+            secondElm.value = second;
+        }
+
+        if (!!operate) {
+            operateElm.value = operate;
+        }
+
+        if (!!repeat) {
+            console.log('repeat:',repeat);
+            progress.value=repeat;
+            Repeat.innerHTML=repeat+'x';
+        }
+
+    }
     function connectToUpServer(){
-        console.log('connectToUpServer:ws://172.0.0.1:3906');
-        upWebConnect=new WebSocket("ws://127.0.0.1:3906");
+        var url = 'ws://127.0.0.1:3906';
+        
+        var searchParams = new URLSearchParams(window.location.search);
+        let address = searchParams.get('address');
+        let port = searchParams.get('port');
+        console.log('searchParams:',address,port);
+        if (!!address && !!port) {
+            url = 'ws://' + address + ':' + port;
+        }
+        
+        console.log('connectToUpServer:' + url);
+        upWebConnect=new WebSocket(url);
         upWebConnect.onopen=function(){
-            // alert("onopen");
+            console.log('connectToUpServer: open');
             const json = {
                 code:0,
                 cmd:"connected",
@@ -328,11 +373,10 @@
         }
 
         upWebConnect.onmessage=function(msg){
-            // alert("onmessage");
+            console.log('connectToUpServer: onmessage');
             try {
                 if (!!msg.data) {
                     const message = JSON.parse(msg.data);
-                    // alert('onmessage:'+JSON.stringify(msg.data));
                     console.log('onmessage:', JSON.stringify(msg.data));
                     console.log('onmessage:', msg.data);
                     parseCmd(message);
@@ -344,21 +388,19 @@
         }
 
         upWebConnect.onerror=function(err){
-            // alert('onerror'+JSON.stringify(err));
             console.log(err.toString());
         }
         upWebConnect.onclose=function(evt){
-            // alert('onclose'+JSON.stringify(evt));
-            var reason=WEBSOCKETERROT(evt);
             console.warn('reason');
         }
     }
 
     function parseCmd(data) {
-        const {cmd, uuid, key, param={}} = data;
+        const {cmd, uuid, key, actionid, param={}} = data;
         console.log('parseCmd:', JSON.stringify(data));
+        currentKey = key;
+        curActionid = actionid;
         if (data.cmd == "add") {
-            currentKey = key;
             const json={
                 code: 0,
                 cmd: "add",
@@ -366,57 +408,95 @@
                 key,
             }
             upWebConnect.send(JSON.stringify(json));
+            if (Object.keys(param).length != 0) {
+                updateView(param);
+            }
+
         }
-        if (data.cmd == "paramfromapp") {
+        if (data.cmd == "paramfromplugin") {
             const data = param;
             
         }
-        if (data.cmd == "run") {
-            const data = param;
-
-            var mode=modeElm.options[modeElm.selectedIndex].value;
-            var operate=operateElm.options[operateElm.selectedIndex].value;
-            var second=secondElm.value;
-            var repeat=progress.value;
-            console.log('get value:',mode,operate,second,repeat);
-            var url = "http:127.0.0.1:3910?"+'repeat='+repeat+'&second='+second+'&operate='+operate;
-            console.log('get url:',url);
-            var json={
-                "cmd": "openview",
-                "url": url,
-                "width": 200,
-                "height": 200,
-                "x": 100,
-                "y": 100
-            };
-            upWebConnect.send(JSON.stringify(json));
+        if (data.cmd == "paramfromapp") {
+            if (Object.keys(param).length != 0) {
+                updateView(param);
+            }
+        }
+        if (data.cmd === 'clear' || data.cmd == 'clearAll') {
+            upWebConnect.close();
+            console.log('ws close');
         }
     }
-    // function connectToMainServer(){
-
-    // }
 
     window.onload(onload);
     connectToUpServer();
-    setInterval(()=>{
-        var mode=modeElm.options[modeElm.selectedIndex].value;
-        var operate=operateElm.options[operateElm.selectedIndex].value;
-        var second=secondElm.value;
-        var repeat=progress.value;
-        console.log('get value:',mode,operate,second,repeat);
-    },5000);
+    // setInterval(()=>{
+    //     var mode=modeElm.options[modeElm.selectedIndex].value;
+    //     var operate=operateElm.options[operateElm.selectedIndex].value;
+    //     var second=secondElm.value;
+    //     var repeat=progress.value;
+    //     console.log('get value:',mode,operate,second,repeat);
+    // },5000);
 
-    function send(){
-        var mode=modeElm.options[modeElm.selectedIndex].value;
-        var operate=operateElm.options[operateElm.selectedIndex].value;
+    function sendSec(){
         var second=secondElm.value;
-        var repeat=progress.value;
-        console.log('get value:',mode,operate,second,repeat);
-        var url = "http:127.0.0.1:3910?"+'repeat='+repeat+'&second='+second+'&operate='+operate;
+        console.log('get value:',second);
+        var url = pluginUpdate+'&second='+second;
         fetch(url)
 			.then(response => response.json())
 			.then(data => console.log(data))
 			.catch(error => console.log('Error:', error));
+        const json={
+            cmd: "paramfromplugin",
+            uuid: UUID,
+            key: currentKey,
+            actionid: curActionid,
+            param: {
+                second
+            }
+        }
+        console.log('paramfromplugin:', JSON.stringify(json));
+        upWebConnect.send(JSON.stringify(json));
+    }
+    function sendRep(){
+        var repeat=progress.value;
+        console.log('get value:',repeat);
+        var url = pluginUpdate+'repeat='+repeat;
+        fetch(url)
+			.then(response => response.json())
+			.then(data => console.log(data))
+			.catch(error => console.log('Error:', error));
+        const json={
+            cmd: "paramfromplugin",
+            uuid: UUID,
+            key: currentKey,
+            actionid: curActionid,
+            param: {
+                repeat
+            }
+        }
+        console.log('paramfromplugin:', JSON.stringify(json));
+        upWebConnect.send(JSON.stringify(json));
+    }
+    function sendOpe(){
+        var operate=operateElm.options[operateElm.selectedIndex].value;
+        console.log('get value:',mode,operate,second,repeat);
+        var url = pluginUpdate+'repeat='+repeat;
+        fetch(url)
+			.then(response => response.json())
+			.then(data => console.log(data))
+			.catch(error => console.log('Error:', error));
+        const json={
+            cmd: "paramfromplugin",
+            uuid: UUID,
+            key: currentKey,
+            actionid: curActionid,
+            param: {
+                operate
+            }
+        }
+        console.log('paramfromplugin:', JSON.stringify(json));
+        upWebConnect.send(JSON.stringify(json));
     }
     // connectToMainServer();
 </script>
